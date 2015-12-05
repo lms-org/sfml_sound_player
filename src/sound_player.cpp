@@ -5,10 +5,12 @@
 #include <SFML/Audio/SoundSource.hpp>
 
 bool SoundPlayer::initialize() {
+
     //Set values from config
     std::vector<std::string> soundList = config().getArray<std::string>("sounds");
+    sounds.resize(soundList.size());
     for(int i = 0; i < (int)soundList.size();i++){
-        SoundBufferContainer container;
+        SoundBufferContainer &container = sounds[i];
         if(!container.buffer.loadFromFile(lms::Framework::configsDirectory + "/" +soundList[i])){
             logger.error("initialize")<<"couldn't load file: "<< soundList[i];
             return false;
@@ -17,16 +19,18 @@ bool SoundPlayer::initialize() {
         container.sound.setBuffer(container.buffer);
         container.sound.setVolume(100);
         container.sound.setLoop(true);
+        container.name = soundList[i];
         container.sound.setPitch(1.0);
-        sounds.push_back(container);
+        //add it to the list
+        //name is the name of the file
+        logger.debug("initialize")<<"added sound: "<<soundList[i];
     }
     //get playList
-    playList = datamanager()->readChannel<soundUtils::Sounds>(this, "PLAYLIST");
+    playList = readChannel<soundUtils::Sounds>("PLAYLIST");
     return true;
 }
 
 bool SoundPlayer::cycle() {
-
     for(SoundBufferContainer &res : sounds){
         bool used = false;
         for(const soundUtils::SoundFile &toPlay:*playList){
@@ -43,6 +47,7 @@ bool SoundPlayer::cycle() {
                 }else if(res.sound.getStatus() == sf::SoundSource::Status::Paused){
                     res.sound.play();
                 }
+                logger.debug("cycle")<<"playing sound"<<toPlay.name;
             }
         }
         if(!used){

@@ -1,9 +1,7 @@
 #ifndef SOUND_PLAYER_H
 #define SOUND_PLAYER_H
 
-#include <lms/datamanager.h>
 #include <lms/module.h>
-#include <lms/type/module_config.h>
 #include <SFML/Audio.hpp>
 #include "sound_player/sound_player_utils.h"
 

@@ -1,17 +1,17 @@
 #include <sound_player.h>
 #include <lms/extra/time.h>
 #include <SFML/Audio.hpp>
-#include <lms/framework.h>
 #include <SFML/Audio/SoundSource.hpp>
 
 bool SoundPlayer::initialize() {
 
     //Set values from config
     std::vector<std::string> soundList = config().getArray<std::string>("sounds");
+    std::vector<std::string> soundListPaths = config().getArray<std::string>("soundPaths");
     sounds.resize(soundList.size());
     for(int i = 0; i < (int)soundList.size();i++){
         SoundBufferContainer &container = sounds[i];
-        if(!container.buffer.loadFromFile(lms::Framework::configsDirectory + "/" +soundList[i])){
+        if(!container.buffer.loadFromFile(soundListPaths[i])){
             logger.error("initialize")<<"couldn't load file: "<< soundList[i];
             return false;
         }
